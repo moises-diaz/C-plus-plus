@@ -8,7 +8,7 @@
 int shm_id,DP1_id,DP2_id,sem_id;
 void *shm = NULL;
 int countLetters[20] = {0};
-//显示直方图
+
 void showHisogtam() {
     printf("\033c") ;
     fflush(stdout);
@@ -48,7 +48,7 @@ void showHisogtam() {
     }
 }
 
-// 获得信号后的处理函数
+
 void signalHandler( int signum ){
     showHisogtam();
     del_sem(sem_id);
@@ -56,14 +56,13 @@ void signalHandler( int signum ){
     shm_delete(shm_id);
     printf("\nShazam !!\n");
 
-    // 清理并关闭
-    // 终止程序
+
     exit(signum);
 }
 
 int main(int argc, char* argv[]) {
     signal(SIGINT, signalHandler);
-    if (argc != 4) {                        // 检查是否正确输入命令
+    if (argc != 4) {                        
         printf("error way to open dc!");
         exit(EXIT_FAILURE);
     }
@@ -72,19 +71,19 @@ int main(int argc, char* argv[]) {
     }
     int i,j,k;
     for (i=0; i<20; i++) {
-        countLetters[i] = 0;                // 初始化字母表中的数目
+        countLetters[i] = 0;                
     }
 
     struct data* shared;
-    shm_id = atoi(argv[1]);                 // 获得共享内存id
-    DP1_id = atoi(argv[2]);                 // 获得DP1的PID
-    DP2_id = atoi(argv[3]);                 // 获得DP2的PID
+    shm_id = atoi(argv[1]);                 
+    DP1_id = atoi(argv[2]);                
+    DP2_id = atoi(argv[3]);                 
     //printf("%d %d %d\n",shm_id,DP1_id,DP2_id);
-    sem_id = sem_create((key_t)DP1_id, 1);// 请求信号量，获得其ID，并启用
+    sem_id = sem_create((key_t)DP1_id, 1);// 
     while(1){
-        shm = shm_action(shm_id);              // 启用分配内存
+        shm = shm_action(shm_id);              
         if(shm == (void*)-1){
-            sleep(10);                           // 如果没找到共享的内存,则停止10s后再找
+            sleep(10);                           
             continue;
         }
         else{
@@ -96,7 +95,7 @@ int main(int argc, char* argv[]) {
     while(1) {
 
         sleep(2);
-        p(sem_id);                          // p操作请求获得资源，如果资源已经占用，则挂起当前程序
+        p(sem_id);                         
         /*for (j = 0; j < 60; j++){
             printf("[%d]",shared->isRead[j]);
             fflush(stdout);
@@ -108,8 +107,8 @@ int main(int argc, char* argv[]) {
                 break;
             }
             if(shared->isRead[k] != -1){
-                thisChar = shared->letters[k] - 'A';    // 获得字母对应于数组的数字
-                countLetters[thisChar] += 1;             // 计数
+                thisChar = shared->letters[k] - 'A';    
+                countLetters[thisChar] += 1;             
                 shared->isRead[k] = 1;
                 k++;
                 if (k > 255){
@@ -120,10 +119,10 @@ int main(int argc, char* argv[]) {
         }
         shared->read = k;
         if (i % 5 == 0){
-            showHisogtam();                             // 显示直方图
+            showHisogtam();                             
         }
         i++;
-        v(sem_id);                                       // v操作重新释放资源的使用权
+        v(sem_id);                                       
     }
 
     exit(EXIT_SUCCESS);
