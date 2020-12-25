@@ -7,19 +7,19 @@
 
 int main() {
     int i,j,k,l;
-    int sem_id, shm_id;  // 定义信号量semID，共享内存shmID
-    char shm_id_c[20];   // 用于把共享内存转化为char*类型
-    void *shm = NULL;    // 定义
+    int sem_id, shm_id;  
+    char shm_id_c[20];   
+    void *shm = NULL;    
     char buf[80];  		
-    getcwd(buf,sizeof(buf));  	// 获得当前位置的路径
+    getcwd(buf,sizeof(buf));  	
     strcat(buf,"/dp2"); 
     struct data mydata;
-    struct data *shared = (struct data *)malloc(sizeof(mydata)); // 给数据结构分配内存
-    shm_id = shm_create((key_t)getpid(), sizeof(mydata));  // 获得当前pid下的固定key值的共享内存ID
+    struct data *shared = (struct data *)malloc(sizeof(mydata)); 
+    shm_id = shm_create((key_t)getpid(), sizeof(mydata));  
     sprintf(shm_id_c,"%d",shm_id);
-    sem_id = sem_create((key_t)getpid(), 1);  // 请求信号量，获得其ID，并启用
-    shm = shm_action(shm_id);       // 启用分配内存
-    shared = (struct data*)shm;     // 初始化数据结构
+    sem_id = sem_create((key_t)getpid(), 1);  
+    shm = shm_action(shm_id);       
+    shared = (struct data*)shm;     
     shared->write = 0;
     shared->read = 0;
     shared->flag = 1;
@@ -27,13 +27,13 @@ int main() {
         shared->isRead[i] = -1;
     }
     pid_t pid;
-    pid = fork();                     // 建立多线程
-    if(pid == 0){                     // 父级程序执行DP-2
+    pid = fork();                     
+    if(pid == 0){                     
         execl(buf, " ", shm_id_c, (char *)0);
     }
-    else{                             // 子级程序执行2秒写入20个字母
+    else{                             
         while(1) {
-            p(sem_id);                // p操作请求获得资源，如果资源已经占用，则挂起当前程序
+            p(sem_id);                
             k = shared->write;
             for (j = 0; j < 20; j++){
                 if (shared->isRead == 0) {
@@ -41,13 +41,13 @@ int main() {
                 }
                 shared->isRead[k] = 0;
                 k++;
-                if (k > 255){           // 如果k超过了允许的最大内存，则返回到0
+                if (k > 255){           
                     k = 0;
                 }
             }
             if (j > 0) {
                 char* rc = NULL;
-                rc = getRandChar(j);   // 获得随机字母
+                rc = getRandChar(j);   
                 //printf("{");
                 //fflush(stdout);
                 for (l=0;l<j;l++){
@@ -59,7 +59,7 @@ int main() {
                 //fflush(stdout);
             }
             shared->write = k;
-            v(sem_id);                  // v操作重新释放资源的使用权
+            v(sem_id);                  
             sleep(2);
         }
     }
