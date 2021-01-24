@@ -70,7 +70,6 @@ int sem_create(key_t key, int m) {
 	return sem_id;
 }
 
-//删除信号量
 void del_sem(int sem_id){
 	if (semctl(sem_id, 0, IPC_RMID) == -1) {
         fprintf(stderr, "Failed to delete semaphore \n");
